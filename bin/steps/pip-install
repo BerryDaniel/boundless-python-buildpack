@@ -1,0 +1,24 @@
+# Install dependencies with Pip.
+puts-step "Installing dependencies with pip"
+
+[ ! ${FRESH_PYTHON:-} ] && bpwatch start pip_install
+[ ${FRESH_PYTHON:-} ] && bpwatch start pip_install_first
+
+# cleanup exclusions and install via pip
+if [ -f $BUILD_DIR/requirements.txt ]; then
+  for exclude in $PIP_EXCLUDES
+  do
+    if (pip-grep -s cf/requirements.txt $exclude  &> /dev/null) then
+      puts-warn 'The package ${exclude} is listed in cf/requirements.txt.'
+      puts-warn 'The package have been removed from cf/requirements.txt'
+      sed --in-place '/${exclude}/d' cf/requirements.txt
+    fi
+  done
+  puts-step "Cloud Foundry requirements found in cf directory"
+  /app/.heroku/python/bin/pip install -r cf/requirements.txt --exists-action=w --src=./.heroku/src | cleanup | indent
+  cp cf/requirements.txt .heroku/python/requirements-declared.txt
+  /app/.heroku/python/bin/pip freeze > .heroku/python/requirements-installed.txt
+fi
+
+[ ! ${FRESH_PYTHON:-} ] && bpwatch stop pip_install
+[ ${FRESH_PYTHON:-} ] && bpwatch stop pip_install_first

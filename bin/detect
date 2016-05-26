@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+BUILD_DIR=$1
+BP=$(dirname $(dirname $0))
+
+# Exit early if app is clearly not Python.
+if [ ! -f $BUILD_DIR/requirements.txt ] && [ ! -f $BUILD_DIR/cf/requirements.txt ] && [ ! -f $BUILD_DIR/setup.py ]; then
+    exit 1
+fi
+
+# Create the cf directory if it does not exist
+if [ ! -d $BUILD_DIR/cf ]; then
+    mkdir -p $BUILD_DIR/cf
+fi
+
+
+if [ ! -f $BUILD_DIR/cf/requirements.txt ] && [ -f $BUILD_DIR/requirements.txt ]; then
+    cp $BUILD_DIR/requirements.txt $BUILD_DIR/cf/requirements.txt
+fi
+
+echo "python `cat $BP/VERSION`"

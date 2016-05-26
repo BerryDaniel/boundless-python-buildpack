@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Syntax sugar.
+source $BIN_DIR/utils
+
+if (pip-grep -s requirements.txt setuptools distribute &> /dev/null) then
+
+  puts-warn 'The package setuptools/distribute is listed in requirements.txt.'
+  puts-warn 'The entry has been removed from requirements.txt'
+  puts-warn 'A backup of the original file has been made'
+  sed --in-place '/setuptools/d' requirements.txt
+  sed --in-place '/distribute/d' requirements.txt
+fi

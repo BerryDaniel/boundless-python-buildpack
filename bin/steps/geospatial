@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+GEO_VENDOR="https://s3.amazonaws.com/boundlessps-public/cf/vendor.tar.gz"
+WHEELS=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/GDAL-2.1.0-cp27-cp27m-linux_x86_64.whl")
+WHEELS+=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/numpy-1.11.0-cp27-cp27m-manylinux1_x86_64.whl")
+WHEELS+=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/pyproj-1.9.5.1-cp27-cp27m-linux_x86_64.whl")
+PKG_CONFIG_PATH="/app/.heroku/vendor/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+source $BIN_DIR/utils
+. buildpack.cfg
+bpwatch start geospatial_install
+
+if [ ${gdal^^} == "TRUE" ]; then
+  echo "-----> Bootstrapping GDAL-2.1.0 Libs"
+  echo "-----> Bootstrapping GEOS-3.5.0 Libs"
+  echo "-----> Bootstrapping PROJ-4.9.2 Libs"
+  mkdir -p .heroku/
+  # Download and extract binaries + libraries into target vendor directory.
+  curl $GEO_VENDOR -s | tar zxv -C .heroku/ &> /dev/null
+  pushd .heroku/vendor/lib/ &> /dev/null
+  find -type l -delete
+  # gdal
+  ln -s libgdal.so.20.1.0 libgdal.so
+  ln -s libgdal.so.20.1.0 libgdal.so.20
+  # geos
+  ln -s libgeos_c.so.1.9.0 libgeos_c.so
+  ln -s libgeos_c.so.1.9.0 libgeos_c.so.1
+  ln -s libgeos-3.5.0.so libgeos.so
+  # proj
+  ln -s libproj.so.9.1.0 libproj.so
+  ln -s libproj.so.9.1.0 libproj.so.9
+  # libkml
+  ln -s libkmlbase.so.1.3.0 libkmlbase.so
+  ln -s libkmlbase.so.1.3.0 libkmlbase.so.1
+  ln -s libkmlconvenience.so.1.3.0 libkmlconvenience.so
+  ln -s libkmlconvenience.so.1.3.0 libkmlconvenience.so.1
+  ln -s libkmldom.so.1.3.0 libkmldom.so
+  ln -s libkmldom.so.1.3.0 libkmldom.so.1
+  ln -s libkmlengine.so.1.3.0 libkmlengine.so
+  ln -s libkmlengine.so.1.3.0 libkmlengine.so.1
+  ln -s libkmlregionator.so.1.3.0 libkmlregionator.so
+  ln -s libkmlregionator.so.1.3.0 libkmlregionator.so.1
+  ln -s libkmlxsd.so.1.3.0 libkmlxsd.so
+  ln -s libkmlxsd.so.1.3.0 libkmlxsd.so.1
+  # libecwj2
+  ln -s libNCSCnet.so.0.0.0 libNCSCnet.so
+  ln -s libNCSCnet.so.0.0.0 libNCSCnet.so.0
+  ln -s libNCSEcwC.so.0.0.0 libNCSEcwC.so
+  ln -s libNCSEcwC.so.0.0.0 libNCSEcwC.so.0
+  ln -s libNCSEcw.so.0.0.0 libNCSEcw.so
+  ln -s libNCSEcw.so.0.0.0 libNCSEcw.so.0
+  ln -s libNCSUtil.so.0.0.0 libNCSUtil.so
+  ln -s libNCSUtil.so.0.0.0 libNCSUtil.so.0
+  # MrSID_DSDK
+  ln -s libltidsdk.so.8 libltidsdk.so
+  ln -s liblti_lidar_dsdk.so.1 liblti_lidar_dsdk.so
+  popd &> /dev/null
+
+  mkdir -p .profile.d/
+  cat <<EOF > .profile.d/geospatial.sh
+export PATH="/app/.heroku/vendor/bin:/app/.heroku/python/bin":"${PATH}"
+export LD_LIBRARY_PATH="/app/.heroku/vendor/lib/:/app/.heroku/python/lib/":"{$LD_LIBRARY_PATH}"
+export LIBRARY_PATH="/app/.heroku/vendor/lib/:/app/.heroku/python/lib/":"${LIBRARY_PATH}"
+export INCLUDE_PATH="/app/.heroku/vendor/include/":"${INCLUDE_PATH}"
+export CPATH="${INCLUDE_PATH}"
+export CPPPATH="${INCLUDE_PATH}"
+export LIBKML_CFLAGS="${INCLUDE_PATH}"
+export LIBKML_LIBS="${LIBRARY_PATH}"
+export GDAL_DATA="/app/.heroku/vendor/share/gdal"
+export PROJ_LIB="/app/.heroku/vendor/share/proj"
+export GEOS_LIBRARY_PATH="/app/.heroku/vendor/lib"
+EOF
+  source .profile.d/geospatial.sh
+
+  if (pip-grep -s cf/requirements.txt GDAL numpy numpy &> /dev/null) then
+
+    puts-warn 'The package(s) GDAL|numpy|pyproj are listed in cf/requirements.txt.'
+    puts-warn 'The package(s) have been removed from cf/requirements.txt'
+    sed --in-place '/GDAL/d' cf/requirements.txt
+    sed --in-place '/numpy/d' cf/requirements.txt
+    sed --in-place '/numpy/d' cf/requirements.txt
+  fi
+
+  pip_wheels=""
+  for wheel in "${WHEELS[@]}"
+  do
+    filename=`echo $wheel | sed 's/.*\///'`
+    echo "-----> Bootstrapping ${filename}"
+    pip_wheels+="${wheel} "
+  done
+  /app/.heroku/python/bin/pip install $pip_wheels
+
+fi
+
+bpwatch stop geospatial_install

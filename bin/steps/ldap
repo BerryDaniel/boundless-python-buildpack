@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+WHEELS=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/django_auth_ldap-1.2.8-py2-none-any.whl")
+WHEELS+=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/python_ldap-2.4.25-cp27-cp27m-linux_x86_64.whl")
+
+source $BIN_DIR/utils
+. buildpack.cfg
+
+bpwatch start ldap_install
+
+if [ ${ldap^^} == "TRUE" ]; then
+
+    if (pip-grep -s cf/requirements.txt django_auth_ldap python_ldap &> /dev/null) then
+
+      puts-warn 'The package(s) django_auth_ldap|python_ldap are listed in cf/requirements.txt.'
+      puts-warn 'The package(s) have been removed from cf/requirements.txt'
+      sed --in-place '/django_auth_ldap/d' cf/requirements.txt
+      sed --in-place '/python_ldap/d' cf/requirements.txt
+    fi
+
+    pip_wheels=""
+    for wheel in "${WHEELS[@]}"
+    do
+      filename=`echo $wheel | sed 's/.*\///'`
+      echo "-----> Bootstrapping ${filename}"
+      pip_wheels+="${wheel} "
+    done
+    /app/.heroku/python/bin/pip install $pip_wheels
+
+fi
+
+bpwatch stop ldap_install

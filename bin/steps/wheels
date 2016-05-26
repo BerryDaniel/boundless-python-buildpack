@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+$BIN_DIR/utils
+. buildpack.cfg
+
+bpwatch start wheels_install
+
+if [ -d cf/wheels ]; then
+  count=$(find cf/wheels -maxdepth 1 -name '*.whl' | wc -l)
+  if [ $count != 0 ]; then
+    wheels=""
+    pushd cf/wheels &> /dev/null
+    for whl in *.whl
+    do
+      count=0
+      for exclude in $PIP_EXCLUDES
+      do
+        if [[ $whl == *${exclude}* ]]; then
+          ((count++))
+        fi
+      done
+      if [ $count == 0 ]; then
+        echo "-----> Bootstrapping ${whl}"
+        wheels+="${whl} "
+      fi
+    done
+    /app/.heroku/python/bin/pip install  $wheels
+    popd &> /dev/null
+  fi
+fi
+
+bpwatch stop wheels_install
