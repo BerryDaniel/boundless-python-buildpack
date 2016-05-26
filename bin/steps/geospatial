@@ -4,6 +4,7 @@ GEO_VENDOR="https://s3.amazonaws.com/boundlessps-public/cf/vendor.tar.gz"
 WHEELS=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/GDAL-2.1.0-cp27-cp27m-linux_x86_64.whl")
 WHEELS+=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/numpy-1.11.0-cp27-cp27m-manylinux1_x86_64.whl")
 WHEELS+=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/pyproj-1.9.5.1-cp27-cp27m-linux_x86_64.whl")
+WHEELS+=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/urllib3-1.15.1-py2.py3-none-any.whl")
 PKG_CONFIG_PATH="/app/.heroku/vendor/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 source $BIN_DIR/utils
@@ -74,11 +75,12 @@ EOF
 
   if (pip-grep -s cf/requirements.txt GDAL numpy numpy &> /dev/null) then
 
-    puts-warn 'The package(s) GDAL|numpy|pyproj are listed in cf/requirements.txt.'
+    puts-warn 'The package(s) GDAL|numpy|pyproj|urllib3 are listed in cf/requirements.txt.'
     puts-warn 'The package(s) have been removed from cf/requirements.txt'
     sed --in-place '/GDAL/d' cf/requirements.txt
     sed --in-place '/numpy/d' cf/requirements.txt
-    sed --in-place '/numpy/d' cf/requirements.txt
+    sed --in-place '/pyproj/d' cf/requirements.txt
+    sed --in-place '/urllib3/d' cf/requirements.txt
   fi
 
   pip_wheels=""
