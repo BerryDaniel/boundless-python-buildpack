@@ -30,7 +30,7 @@ if [ ! "$SKIP_INSTALL" ]; then
     exit_code=0
     url="https://lang-python.s3.amazonaws.com/$STACK/runtimes/$PYTHON_VERSION.tar.gz"
     curl $url -s | tar zxv -C .heroku/python &> /dev/null
-    echo "Downloaded [${url}] | sed 's/.*\///'`"
+    echo "Downloaded [${url}] | sed 's/.*\///'"
 
   bpwatch stop install_python
 
