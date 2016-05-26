@@ -4,7 +4,7 @@ WHEELS=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/django_auth_ldap-
 WHEELS+=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/python_ldap-2.4.25-cp27-cp27m-linux_x86_64.whl")
 
 source $BIN_DIR/utils
-. buildpack.cfg
+. cf/buildpack.cfg
 
 bpwatch start ldap_install
 

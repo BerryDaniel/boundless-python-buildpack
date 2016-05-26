@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 $BIN_DIR/utils
-. buildpack.cfg
+. cf/buildpack.cfg
 
 bpwatch start wheels_install
 

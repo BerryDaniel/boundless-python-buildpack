@@ -7,7 +7,7 @@ WHEELS+=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/pyproj-1.9.5.1-c
 PKG_CONFIG_PATH="/app/.heroku/vendor/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 source $BIN_DIR/utils
-. buildpack.cfg
+. cf/buildpack.cfg
 bpwatch start geospatial_install
 
 if [ ${gdal^^} == "TRUE" ]; then

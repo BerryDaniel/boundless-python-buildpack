@@ -29,7 +29,8 @@ if (pip-grep -s requirements.txt bcrypt cffi cryptography pyOpenSSL PyOpenSSL re
     mkdir -p .heroku/vendor
     # Download and extract cryptography into target vendor directory.
     curl $VENDORED_LIBFFI -s | tar zxv -C .heroku/vendor &> /dev/null
-    echo "Downloaded [${VENDORED_LIBFFI}] | sed 's/.*\///'"
+    download=`echo $VENDORED_LIBFFI | sed 's/.*\///'`
+    echo "Downloaded [${download}]"
     export LIBFFI=$(pwd)/vendor
   fi
 fi
