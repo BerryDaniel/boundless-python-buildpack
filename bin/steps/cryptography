@@ -12,7 +12,7 @@ bpwatch start libffi_install
 if [ -d ".heroku/vendor/lib/libffi-3.1.1" ]; then
   export LIBFFI=$(pwd)/vendor
 else
-  echo "-----> Noticed cffi. Bootstrapping libffi."
+  echo "-----> Bootstrapping libffi."
   mkdir -p .heroku/vendor
   # Download and extract cryptography into target vendor directory.
   curl $VENDORED_LIBFFI -s | tar zxv -C .heroku/vendor &> /dev/null
