@@ -2,6 +2,7 @@
 
 $BIN_DIR/utils
 . cf/buildpack.cfg
+source .profile.d/geospatial.sh
 
 bpwatch start wheels_install
 
