@@ -23,6 +23,6 @@ if (pip-grep -s requirements.txt bcrypt cffi cryptography pyOpenSSL PyOpenSSL re
     export LIBFFI=$(pwd)/vendor
   fi
 
-if
+fi
 
 bpwatch stop libffi_install

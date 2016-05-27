@@ -151,10 +151,12 @@ pushd Python-$PY_VER
 ./configure --prefix /usr/local --enable-ipv6
 make && sudo make install
 popd && rm -fr Python-$PY_VER
+popd
+
 
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo /usr/local/bin/python
 sudo /usr/local/bin/pip install virtualenv
 pushd /app/.heroku/
 /usr/local/bin/virtualenv python
 source python/bin/activate
-pip wheel --wheel-dir=/vagrant/wheels -r /vagrant/pip_dep.txt
+/usr/local/bin/pip wheel --wheel-dir=/vagrant/wheels -r /vagrant/pip_dep.txt
