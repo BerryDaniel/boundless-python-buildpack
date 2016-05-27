@@ -1,0 +1,11 @@
+*.pyc
+site
+.idea
+log/
+**/.DS_Store
+/python_buildpack-*.zip
+.bundle/
+
+vendor.tar.gz
+*.whl
+/vagrant-lib-build/.vagrant

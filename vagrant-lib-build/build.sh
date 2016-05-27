@@ -9,14 +9,16 @@ fi
 
 GDAL_VER=2.1.0
 GEOS_VER=3.5.0
-PYTH_VER=2.7.11
+PY_VER=2.7.11
 PROJ_VER=4.9.2
-LKML_VER=1.3.0
+KML_VER=1.3.0
+PG_VER=9.5.3
 
 export PATH="/app/.heroku/vendor/bin:/app/.heroku/python/bin":"${PATH}"
 export LD_LIBRARY_PATH="/app/.heroku/vendor/lib/:/app/.heroku/python/lib/":"{$LD_LIBRARY_PATH}"
 export LIBRARY_PATH="/app/.heroku/vendor/lib/:/app/.heroku/python/lib/":"${LIBRARY_PATH}"
 export INCLUDE_PATH="/app/.heroku/vendor/include/":"${INCLUDE_PATH}"
+export PKG_CONFIG="/app/.heroku/vendor/lib/pkgconfig/":"${PKG_CONFIG}"
 export CPATH="${INCLUDE_PATH}"
 export CPPPATH="${INCLUDE_PATH}"
 export LIBKML_CFLAGS="${INCLUDE_PATH}"
@@ -61,22 +63,35 @@ ln -s liblti_lidar_dsdk.so.1 liblti_lidar_dsdk.so
 popd
 popd
 
-if [ ! -f $LKML_VER.tar.gz ]; then
+pushd ~
+
+if [ ! -f postgresql-$PG_VER.tar.gz ]; then
+    wget https://ftp.postgresql.org/pub/source/v$PG_VER/postgresql-$PG_VER.tar.gz
+fi
+tar xf postgresql-$PG_VER.tar.gz
+pushd postgresql-$PG_VER
+sed --in-place '/fmgroids/d' src/include/Makefile
+./configure --prefix=/app/.heroku/vendor --without-readline
+make -C src/bin install
+make -C src/include install
+make -C src/interfaces install
+make -C doc install
+popd
+
+if [ ! -f $KML_VER.tar.gz ]; then
     wget https://github.com/libkml/libkml/archive/1.3.0.tar.gz
 fi
-tar xvf $LKML_VER.tar.gz
-mkdir -p libkml-$LKML_VER/build
-pushd libkml-$LKML_VER/build
+tar xf $KML_VER.tar.gz
+mkdir -p libkml-$KML_VER/build
+pushd libkml-$KML_VER/build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=/app/.heroku/vendor ..
 make && make install
-popd && rm -fr libkml-$LKML_VER
-
-pushd ~
+popd && rm -fr libkml-$KML_VER
 
 if [ ! -f geos-$GEOS_VER.tar.bz2 ]; then
     wget http://download.osgeo.org/geos/geos-$GEOS_VER.tar.bz2
 fi
-tar xvf geos-$GEOS_VER.tar.bz2
+tar xf geos-$GEOS_VER.tar.bz2
 pushd geos-$GEOS_VER/
 ./configure --prefix=/app/.heroku/vendor/
 make && make install
@@ -85,7 +100,7 @@ popd && rm -fr geos-$GEOS_VER
 if [ ! -f proj-$PROJ_VER.tar.gz ]; then
     wget http://download.osgeo.org/proj/proj-$PROJ_VER.tar.gz
 fi
-tar xvf proj-$PROJ_VER.tar.gz
+tar xf proj-$PROJ_VER.tar.gz
 pushd proj-$PROJ_VER/
 ./configure --prefix=/app/.heroku/vendor/
 make && make install
@@ -105,39 +120,41 @@ pushd gdal-$GDAL_VER/
     --with-curl \
     --with-gif=internal \
     --with-geos=/app/.heroku/vendor/bin/geos-config \
-    --with-proj-share=/app/.heroku/vendor/share \
     --without-expat \
     --with-threads \
     --with-ecw=/app/.heroku/vendor \
     --with-mrsid=/app/.heroku/vendor \
     --with-mrsid_lidar=/app/.heroku/vendor \
     --with-libkml=/app/.heroku/vendor \
+    --with-libkml-inc=/app/.heroku/vendor/include/kml \
+    --with-pg=/app/.heroku/vendor/bin/pg_config
+
 make && make install
 popd && rm -fr gdal-$GDAL_VER/
 popd
-pushd /app/.heroku/
 if [ -d vendor/include/boost ]; then
     rm -fr vendor/include/boost
 fi
+pushd /app/.heroku/
 if [ -f /vagrant/vendor.tar.gz ]; then
     rm -f /vagrant/vendor.tar.gz
 fi
-tar -zcvf vendor.tar.gz vendor/ && mv vendor.tar.gz /vagrant/
+tar -zcf vendor.tar.gz vendor/ && mv vendor.tar.gz /vagrant/
 popd
 
 pushd ~
-if [ ! -f Python-$PYTH_VER.tgz ]; then
-    wget https://www.python.org/ftp/python/$PYTH_VER/Python-$PYTH_VER.tgz
+if [ ! -f Python-$PY_VER.tgz ]; then
+    wget https://www.python.org/ftp/python/$PY_VER/Python-$PY_VER.tgz
 fi
-tar xfz Python-$PYTH_VER.tgz
-pushd Python-$PYTH_VER
+tar xfz Python-$PY_VER.tgz
+pushd Python-$PY_VER
 ./configure --prefix /usr/local --enable-ipv6
 make && sudo make install
-popd && rm -fr Python-$PYTH_VER
+popd && rm -fr Python-$PY_VER
 
 curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo /usr/local/bin/python
 sudo /usr/local/bin/pip install virtualenv
 pushd /app/.heroku/
 /usr/local/bin/virtualenv python
 source python/bin/activate
-pip install -r /vagrant/geonode_dep_24.txt
+pip wheel --wheel-dir=/vagrant/wheels -r /vagrant/pip_dep.txt

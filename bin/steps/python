@@ -28,7 +28,6 @@ if [ ! "$SKIP_INSTALL" ]; then
     mkdir -p .heroku/python
 
     exit_code=0
-    #url="https://lang-python.s3.amazonaws.com/$STACK/runtimes/$PYTHON_VERSION.tar.gz"
     url='https://pivotal-buildpacks.s3.amazonaws.com/concourse-binaries/python/python-2.7.11-linux-x64.tgz'
     curl $url -s | tar zxv -C .heroku/python &> /dev/null
     download=`echo $url | sed 's/.*\///'`
