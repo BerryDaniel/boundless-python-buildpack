@@ -7,7 +7,7 @@ WHEELS+=("https://s3.amazonaws.com/boundlessps-public/cf/wheels/pyproj-1.9.5.1-c
 PKG_CONFIG_PATH="/app/.heroku/vendor/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 source $BIN_DIR/utils
-. cf/buildpack.cfg
+. buildpack.cfg
 bpwatch start geospatial_install
 
 if [ ${gdal^^} == "TRUE" ]; then
@@ -71,15 +71,6 @@ export PROJ_LIB="/app/.heroku/vendor/share/proj"
 export GEOS_LIBRARY_PATH="/app/.heroku/vendor/lib"
 EOF
   source .profile.d/geospatial.sh
-
-  if (pip-grep -s cf/requirements.txt GDAL numpy numpy &> /dev/null) then
-
-    puts-warn 'The package(s) GDAL|numpy|pyproj are listed in cf/requirements.txt.'
-    puts-warn 'The package(s) have been removed from cf/requirements.txt'
-    sed --in-place '/GDAL/d' cf/requirements.txt
-    sed --in-place '/numpy/d' cf/requirements.txt
-    sed --in-place '/pyproj/d' cf/requirements.txt
-  fi
 
   pip_wheels=""
   for wheel in "${WHEELS[@]}"

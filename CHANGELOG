@@ -1,0 +1,242 @@
+v1.5.4 Jan 07, 2016
+====================
+
+* Added 3.4.4, removed 3.4.2
+  (https://www.pivotaltracker.com/story/show/111145834)
+
+* Revert to v1.5.2 of pip-install script to prevent issue where
+  pip contacts the internet in the cached buildpack
+  (https://www.pivotaltracker.com/n/projects/1042066/stories/111018262)
+
+
+v1.5.3 Dec 17, 2015
+====================
+
+* Added 2.7.11 and 3.5.1, removed 2.7.9
+  (https://www.pivotaltracker.com/story/show/110082530)
+
+* Merged upstream with heroku 2a3962a
+  (https://www.pivotaltracker.com/story/show/109618254)
+
+v1.5.2 Nov 16, 2015
+====================
+
+* Developers are given detailed, helpful instructions when they attempt
+  to stage an application whose dependency is not found in the manifest.
+  (https://www.pivotaltracker.com/story/show/107939104)
+
+v1.5.1 Sep 15, 2015
+====================
+
+* Adding support for Python 3.5.0
+  (https://www.pivotaltracker.com/story/show/103268420)
+
+* Output buildpack information in detect script
+  (https://www.pivotaltracker.com/story/show/100757820)
+
+v1.5.0 Jul 20, 2015
+====================
+
+* Include CF built binaries
+  (https://www.pivotaltracker.com/story/show/97136960)
+
+* Include current stack in unsupported stack message
+  (https://www.pivotaltracker.com/story/show/98579464)
+
+* Update pip to 7.1.0
+
+* Update setuptools to 18.0.1
+
+* Set xtrace if $BUILDPACK_XTRACE set
+
+v1.4.0 Jun 24, 2015
+====================
+
+* Remove 2.7.8 from skinny manifest
+
+* Remove lucid-specific binaries from manifest.yml
+  (https://www.pivotaltracker.com/story/show/96135874)
+
+* alert user about incompatible stack usage
+  (https://www.pivotaltracker.com/story/show/96137338)
+
+v1.3.5 Jun 08, 2015
+====================
+
+ * Add python 2.7.10 to the full manifest
+
+v1.3.4 Jun 08, 2015
+====================
+
+* Add support for python 2.7.10
+
+* Merge upstream changes up to SHA 7d4093795bbd2028e34adcac2c6055e0195dff63
+
+v1.3.3 May 28, 2015
+====================
+
+* remove Python versions 3.2.x
+  (https://www.pivotaltracker.com/story/show/94530056)
+
+v1.3.2 May 21, 2015
+====================
+
+* Merge upstream changes from Heroku up to SHA 7fd3a047fdc7a5d0de7c796b1ce06131b84a6a1e 
+	(https://www.pivotaltracker.com/story/show/94986024)
+
+v1.3.1 May 07, 2015
+====================
+
+* Bump buildpack-packager to support custom buildpack manifests.
+  (https://www.pivotaltracker.com/story/show/93717296)
+
+v1.3.0 Apr 24, 2015
+====================
+
+* Deprecated many Python versions. Currently supported versions:
+	(https://www.pivotaltracker.com/story/show/90697224)
+	* 2.7.8
+	* 2.7.9
+	* 3.2.4
+	* 3.2.5
+	* 3.3.5
+	* 3.3.6
+	* 3.4.2
+	* 3.4.3
+
+* Merge upstream changes from Heroku up to SHA 5abe0d24fd24ad797c20c8b43d4cbf1bd2720186
+	(https://www.pivotaltracker.com/story/show/90537742)
+
+v1.2.0 Mar 17, 2015
+====================
+
+* Support cflinuxfs2 stack. Does not support 2.7.1 and 3.2.0
+  (https://www.pivotaltracker.com/story/show/88174352)
+  (https://www.pivotaltracker.com/story/show/90308418)
+
+* Reference git repos by https in cf.Gemfile
+  (https://www.pivotaltracker.com/story/show/90365848)
+
+* Add checksum to `manifest.yml` for all binaries.
+  (https://www.pivotaltracker.com/story/show/89503126)
+
+* Prevent use of app cached dependencies when stack is switched.
+  (https://www.pivotaltracker.com/story/show/89958540)
+
+v1.1.2 Feb 04, 2015
+====================
+
+* Merge upstream changes
+  * Upgrade pip version to 6.0.6 and setuptools version to 11.1
+    (https://github.com/heroku/heroku-buildpack-python/commit/26b54b690c3796198ed911f451a4b70c65d9b5f7)
+  * Add support for PyPy 3
+    (https://github.com/heroku/heroku-buildpack-python/pull/180)
+  * Change URLs to HTTPS
+    (https://github.com/heroku/heroku-buildpack-python/pull/194)
+
+* Update documentation for use in offline environments
+  (https://www.pivotaltracker.com/story/show/86952360)
+  (https://www.pivotaltracker.com/story/show/86853880)
+
+* Update buildpack-packager to v.2.0.0
+  (https://www.pivotaltracker.com/story/show/84805200)
+
+v1.1.1 Dec 15, 2014
+====================
+
+* Merge upstream changes
+  * Add Python 2.7.9
+  * Change default to Python 2.7.9
+
+* Complete introduction of new runtime dependency translation system
+  (https://www.pivotaltracker.com/story/show/84330782)
+
+v1.1.0 Dec 08, 2014
+====================
+
+* Merge upstream changes
+  (https://www.pivotaltracker.com/story/show/83960192)
+  * Add Python 3.3.6, 3.4.2
+  * Add PyPy 2.4.0
+  * Upgrade setuptools to version 7.0
+  * Add --enable-shared to Python runtime options
+    (https://github.com/cloudfoundry/python-buildpack/issues/7)
+    (https://github.com/heroku/heroku-buildpack-python/issues/181)
+  * Fix typo in libffi check
+    (https://github.com/cloudfoundry/python-buildpack/pull/5)
+    (https://github.com/heroku/heroku-buildpack-python/pull/176)
+
+* Introduce new offline dependency packaging system
+  (https://www.pivotaltracker.com/story/show/82513994)
+  (https://www.pivotaltracker.com/story/show/83886038)
+
+* Introduce new runtime dependency translation system
+  (https://www.pivotaltracker.com/story/show/82513994)
+  (https://www.pivotaltracker.com/story/show/83483872)
+  (https://www.pivotaltracker.com/story/show/83504664)
+
+* Update the README with Machete instructions
+  (https://www.pivotaltracker.com/story/show/82692644)
+
+v1.0.5 Oct 06, 2014
+====================
+
+* Merge Heroku upstream change.
+
+v1.0.4 Sep 30, 2014
+====================
+
+Resolve broken buildpack version output.
+  (https://www.pivotaltracker.com/story/show/79781536)
+  (https://www.pivotaltracker.com/n/projects/966314/stories/79702506)
+
+v1.0.3 Sep 29, 2014
+====================
+
+* Merges Heroku upstream change:
+  * Add bcrypt to the list of dependencies triggering libffi installation
+
+
+v1.0.2 Sep 05, 2014
+====================
+
+* Merges Heroku upstream changes, in particular:
+    * Support for Python 2.7.8
+    * Support for setuptools 5.4.1
+    * Improved Python 3 compatibility
+    * Solves readonly failures
+    * Adds crypto support
+  (https://www.pivotaltracker.com/story/show/76112924)
+
+* Bumps CF testing libraries
+
+
+v1.0.1 Jul 22, 2014
+====================
+
+* Improve documentation and make the README CF specific.
+  (https://www.pivotaltracker.com/story/show/69192654)
+  (https://www.pivotaltracker.com/story/show/73157760)
+
+* Switch to new Cloud Foundry offline dependency framework
+  (https://www.pivotaltracker.com/story/show/74053110)
+  (https://www.pivotaltracker.com/story/show/73384384)
+  (https://www.pivotaltracker.com/story/show/73723814)
+  (https://www.pivotaltracker.com/story/show/73544396)
+
+* Improve version imprinting
+  (https://www.pivotaltracker.com/story/show/73158908)
+
+* Use Ruby 2.1.1 for packaging
+
+* Fix: Bug in mercurial spec
+  (https://www.pivotaltracker.com/story/show/73544396)
+
+* Fix: Offline mode should not attempt to use public networks
+  (https://www.pivotaltracker.com/story/show/73420832)
+
+v1.0.0 Jun 17, 2014
+===================
+
+* Modify [the Heroku Python buildpack](https://github.com/heroku/heroku-buildpack-python) to
+  support offline mode.

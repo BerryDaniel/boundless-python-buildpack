@@ -28,10 +28,14 @@ if [ ! "$SKIP_INSTALL" ]; then
     mkdir -p .heroku/python
 
     exit_code=0
-    url='https://pivotal-buildpacks.s3.amazonaws.com/concourse-binaries/python/python-2.7.11-linux-x64.tgz'
-    curl $url -s | tar zxv -C .heroku/python &> /dev/null
-    download=`echo $url | sed 's/.*\///'`
-    echo "Downloaded [${download}]"
+    url="https://lang-python.s3.amazonaws.com/$STACK/runtimes/$PYTHON_VERSION.tar.gz"
+    translated_url=$(translate_dependency_url $url) || exit_code=$?
+    if [[ $exit_code != 0 ]] ; then
+      $ROOT_DIR/compile-extensions/bin/recommend_dependency $url
+      exit 1
+    fi
+    curl "$translated_url" -s | tar zxv -C .heroku/python &> /dev/null
+    echo "Downloaded [$translated_url]"
 
   bpwatch stop install_python
 

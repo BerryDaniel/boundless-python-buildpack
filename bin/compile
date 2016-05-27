@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Usage:
+#
+#     $ bin/compile <build-dir> <cache-dir> <env-path>
+
+# Fail fast and fail hard.
 set -eo pipefail
 
 [ "$BUILDPACK_XTRACE" ] && set -o xtrace
@@ -13,6 +18,8 @@ ROOT_DIR=$(dirname $BIN_DIR)
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
+
+$ROOT_DIR/compile-extensions/bin/check_stack_support
 
 # The ROOT_DIR is read only so we can't install dependencies in it
 # Move the ROOT_DIR contents to tmp and point ROOT_DIR to the new root
@@ -34,8 +41,8 @@ LEGACY_TRIGGER="lib/python2.7"
 DEFAULT_PYTHON_VERSION="python-2.7.11"
 DEFAULT_PYTHON_STACK="cedar"
 PYTHON_EXE="/app/.heroku/python/bin/python"
-PIP_VERSION="8.1.2"
-SETUPTOOLS_VERSION="21.2.1"
+PIP_VERSION="8.0.3"
+SETUPTOOLS_VERSION="20.2.2"
 
 # PIP Exclusions
 PIP_EXCLUDES="GDAL pyproj numpy django_auth_ldap python_ldap"
@@ -72,7 +79,7 @@ source $BIN_DIR/utils
 # CF Common
 BUILDPACK_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"
 export BUILDPACK_PATH
-
+source $BUILDPACK_PATH/compile-extensions/lib/common
 # END CF Common
 #
 # Import collection of warnings.
@@ -132,9 +139,14 @@ if [[ ! -f Procfile ]]; then
   puts-warn 'Learn more: https://devcenter.heroku.com/articles/procfile'
 fi
 
+# Experimental pre_compile hook.
+bpwatch start pre_compile
+  source $BIN_DIR/steps/hooks/pre_compile
+bpwatch stop pre_compile
+
 # If no requirements given, assume `setup.py develop`.
 if [ ! -f requirements.txt ]; then
-  echo "-e ." > cf/requirements.txt
+  echo "-e ." > requirements.txt
 fi
 
 
@@ -204,11 +216,8 @@ source $BIN_DIR/steps/cryptography
 # Geospatial support.
 source $BIN_DIR/steps/geospatial
 
-# LDAP support
+# LDAP support.
 source $BIN_DIR/steps/ldap
-
-# Local Wheel support
-source $BIN_DIR/steps/wheels
 
 # Install dependencies with Pip.
 source $BIN_DIR/steps/pip-install
@@ -232,6 +241,12 @@ set-default-env PYTHONPATH /app/
 
 # Install sane-default script for WEB_CONCURRENCY environment variable.
 cp $ROOT_DIR/vendor/python.webconcurrency.sh $WEBCONCURRENCY_PROFILE_PATH
+
+
+# Experimental post_compile hook.
+bpwatch start post_compile
+  source $BIN_DIR/steps/hooks/post_compile
+bpwatch stop post_compile
 
 # Store new artifacts in cache.
 bpwatch start dump_cache
